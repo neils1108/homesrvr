@@ -1,11 +1,839 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
----
+import '../styles/global.css';
+import config from '../config/homesrvr';
+----------------------------------------
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="utf-8" />
+
+```
+	<link
+		rel="icon"
+		type="image/svg+xml"
+		href="/favicon.svg"
+	/>
+
+	<link
+		rel="icon"
+		href="/favicon.ico"
+	/>
+
+	<meta
+		name="viewport"
+		content="width=device-width"
+	/>
+
+	<meta
+		name="generator"
+		content={Astro.generator}
+	/>
+
+	<title>{config.site.name}</title>
+
+	<script
+		src="https://kit.fontawesome.com/193f26ab90.js"
+		crossorigin="anonymous"
+	></script>
+
+	<link
+		href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
+		rel="stylesheet"
+	/>
+</head>
+
+<body class="bg-[#12100E] min-h-screen">
+
+	<main class="min-h-screen p-4">
+
+		<!-- HEADER -->
+
+		<header class="flex items-center gap-4 w-full justify-between">
+
+			<div>
+
+				<h1 class="text-3xl font-satoshi font-bold text-[#F0ECE7] px-4">
+					{config.site.name}
+				</h1>
+
+				{config.site.subtitle && (
+					<p class="text-lg font-satoshi font-semibold text-[#7D756D] px-4">
+						{config.site.subtitle}
+					</p>
+				)}
+
+				<div class="flex flex-wrap">
+
+					{config.favorites.map((favorite) => (
+						<p class="text-lg font-satoshi font-semibold text-[#7D756D] px-4 my-2">
+
+							<a
+								class="relative inline-block w-fit after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all hover:after:w-full"
+								href={favorite.url}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{favorite.name}
+							</a>
+
+						</p>
+					))}
+
+				</div>
+
+			</div>
+
+
+			<div class="flex gap-3 items-center justify-center px-4">
+
+				<div
+					id="overall-status-dot"
+					class="w-5 h-5 rounded-full bg-gray-400"
+				></div>
+
+				<p
+					id="overall-status-text"
+					class="text-xl font-satoshi font-semibold text-[#7D756D]"
+				>
+					All systems are down
+				</p>
+
+			</div>
+
+		</header>
+
+
+		<!-- OVERVIEW -->
+
+		{config.overview.enabled && (
+			<section>
+
+				<h2 class="text-3xl font-satoshi font-bold text-[#F0ECE7] px-4 my-10">
+					{config.overview.title}
+				</h2>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 px-4">
+
+					{config.overview.servers
+						.slice(0, 4)
+						.map((server) => (
+
+							<div
+								class="server-card px-4 border rounded-lg border-[#3A342E] bg-[#25211D] hover:bg-[#2D2823] transition-colors duration-300"
+								data-server-id={server.serverId}
+							>
+
+								<p class="text-2xl font-satoshi font-semibold text-[#B5ADA4] my-3">
+									{server.name}
+								</p>
+
+
+								<div class="flex gap-3 items-center my-3">
+
+									<div
+										class="server-status-dot w-5 h-5 bg-gray-400 rounded-full"
+									></div>
+
+									<p class="server-status-text text-xl font-satoshi font-semibold text-[#7D756D]">
+										Unknown
+									</p>
+
+								</div>
+
+
+								<div class="flex gap-3 my-3 justify-between">
+
+									<p class="server-cpu text-lg font-satoshi font-semibold text-[#7D756D]">
+										CPU: --
+									</p>
+
+									<p class="server-memory text-lg font-satoshi font-semibold text-[#7D756D]">
+										Mem: --
+									</p>
+
+								</div>
+
+
+								<p class="text-lg font-satoshi font-semibold text-[#7D756D]">
+									OS:
+								</p>
+
+								<p class="server-os text-lg font-satoshi font-semibold text-[#B5ADA4] my-3">
+									Unknown
+								</p>
+
+
+								<p class="text-lg font-satoshi font-semibold text-[#7D756D]">
+									IP:
+								</p>
+
+								<p class="server-ip text-lg font-satoshi font-semibold text-[#B5ADA4] my-3">
+									Unknown
+								</p>
+
+
+								<p class="text-lg font-satoshi font-semibold text-[#7D756D]">
+									Hostname:
+								</p>
+
+								<p class="server-hostname text-lg font-satoshi font-semibold text-[#B5ADA4] my-3">
+									Unknown
+								</p>
+
+							</div>
+
+						))}
+
+				</div>
+
+			</section>
+		)}
+
+
+		<!-- NETWORK -->
+
+		{config.network.enabled && (
+			<section>
+
+				<h2 class="text-3xl font-satoshi font-bold text-[#F0ECE7] px-4 my-10">
+					{config.network.title}
+				</h2>
+
+				<div class="flex gap-4 px-4">
+
+					<div class="px-4 border w-full md:w-2/3 lg:w-1/2 rounded-lg border-[#3A342E] bg-[#25211D]">
+
+						{config.network.download.enabled && (
+							<div class="flex justify-between w-full">
+
+								<p class="text-2xl font-satoshi font-semibold text-[#B5ADA4] my-3">
+									{config.network.download.label}:
+								</p>
+
+								<p
+									id="network-download"
+									class="text-xl font-satoshi font-semibold text-[#7D756D] my-3"
+								>
+									--
+								</p>
+
+							</div>
+						)}
+
+
+						{config.network.upload.enabled && (
+							<div class="flex justify-between w-full">
+
+								<p class="text-2xl font-satoshi font-semibold text-[#B5ADA4] my-3">
+									{config.network.upload.label}:
+								</p>
+
+								<p
+									id="network-upload"
+									class="text-xl font-satoshi font-semibold text-[#7D756D] my-3"
+								>
+									--
+								</p>
+
+							</div>
+						)}
+
+
+						{config.network.latency.enabled && (
+							<div class="flex justify-between w-full">
+
+								<p class="text-2xl font-satoshi font-semibold text-[#B5ADA4] my-3">
+									{config.network.latency.label}:
+								</p>
+
+								<p
+									id="network-latency"
+									class="text-xl font-satoshi font-semibold text-[#7D756D] my-3"
+								>
+									--
+								</p>
+
+							</div>
+						)}
+
+					</div>
+
+				</div>
+
+			</section>
+		)}
+
+
+		<!-- SERVICES -->
+
+		{config.services.enabled && config.services.items.length > 0 && (
+			<section>
+
+				<h2 class="text-3xl font-satoshi font-bold text-[#F0ECE7] px-4 my-10">
+					{config.services.title}
+				</h2>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+
+					{config.services.items.map((service) => (
+
+						<div
+							class="service-item flex gap-3 items-center px-4 my-3"
+							data-service-name={service.name}
+						>
+
+							<div class="service-status-dot w-5 h-5 bg-gray-400 rounded-full"></div>
+
+							<p class="text-xl font-satoshi font-semibold text-[#7D756D]">
+
+								{service.url ? (
+
+									<a
+										class="relative inline-block w-fit after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all hover:after:w-full"
+										href={service.url}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{service.name}
+									</a>
+
+								) : (
+
+									service.name
+
+								)}
+
+							</p>
+
+						</div>
+
+					))}
+
+				</div>
+
+			</section>
+		)}
+
+
+		<!-- LINKS -->
+
+		{config.links.enabled && config.links.items.length > 0 && (
+			<section>
+
+				<h2 class="text-3xl font-satoshi font-bold text-[#F0ECE7] px-4 my-10">
+					{config.links.title}
+				</h2>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+
+					{config.links.items.map((link) => (
+
+						<div class="flex gap-3 items-center px-4 my-3">
+
+							<p class="text-xl font-satoshi font-semibold text-[#7D756D]">
+
+								<a
+									class="relative inline-block w-fit after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all hover:after:w-full"
+									href={link.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{link.name}
+								</a>
+
+							</p>
+
+						</div>
+
+					))}
+
+				</div>
+
+			</section>
+		)}
+
+
+		<!-- FOOTER -->
+
+		{config.footer.enabled && (
+			<footer class="flex items-center gap-4 w-full justify-between md:px-0 py-22 clear-both">
+
+				<p class="text-md font-satoshi font-semibold text-[#7D756D] px-4">
+
+					{config.footer.text}{' '}
+
+					<a
+						class="relative inline-block w-fit after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all hover:after:w-full"
+						href={config.footer.url}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{config.footer.name}
+					</a>
+
+				</p>
+
+			</footer>
+		)}
+
+	</main>
+
+
+	<!-- LIVE STATUS -->
+
+	<script>
+		type Server = {
+			id: number;
+			status: 'up' | 'down' | 'unknown';
+			cpu_usage: number;
+			memory_usage: number;
+			address: string | null;
+			hostname: string | null;
+			os: string | null;
+			network_download: number | null;
+			network_upload: number | null;
+			network_latency: number | null;
+		};
+
+		type Service = {
+			name: string;
+			status: 'up' | 'down' | 'unknown';
+			responseTime: number | null;
+		};
+
+
+		function setDot(
+			element: HTMLElement,
+			status: 'up' | 'down' | 'unknown'
+		) {
+			element.classList.remove(
+				'bg-green-300',
+				'bg-red-300',
+				'bg-gray-400',
+				'bg-orange-300'
+			);
+
+			if (status === 'up') {
+				element.classList.add('bg-green-300');
+			} else if (status === 'down') {
+				element.classList.add('bg-red-300');
+			} else {
+				element.classList.add('bg-gray-400');
+			}
+		}
+
+
+		function parseOS(osString: string | null) {
+			if (!osString) {
+				return 'Unknown';
+			}
+
+			try {
+				const os = JSON.parse(osString);
+
+				return (
+					os.distro ||
+					os.platform ||
+					'Unknown'
+				);
+			} catch {
+				return osString;
+			}
+		}
+
+
+		function updateOverallStatus(
+			statuses: Array<'up' | 'down' | 'unknown'>
+		) {
+			const dot =
+				document.querySelector(
+					'#overall-status-dot'
+				) as HTMLElement | null;
+
+			const text =
+				document.querySelector(
+					'#overall-status-text'
+				) as HTMLElement | null;
+
+			if (!dot || !text) {
+				return;
+			}
+
+			if (
+				statuses.length > 0 &&
+				statuses.every(
+					(status) => status === 'up'
+				)
+			) {
+				setDot(dot, 'up');
+
+				text.textContent =
+					'All systems are OK';
+
+				return;
+			}
+
+			if (
+				statuses.length > 0 &&
+				statuses.every(
+					(status) => status === 'down'
+				)
+			) {
+				setDot(dot, 'down');
+
+				text.textContent =
+					'All systems are down';
+
+				return;
+			}
+
+			dot.classList.remove(
+				'bg-green-300',
+				'bg-red-300',
+				'bg-gray-400',
+				'bg-orange-300'
+			);
+
+			dot.classList.add('bg-orange-300');
+
+			text.textContent =
+				'Some systems are down';
+		}
+
+
+		function formatSpeed(
+			speedMbps: number | null
+		) {
+			if (
+				speedMbps === null ||
+				!Number.isFinite(speedMbps)
+			) {
+				return '--';
+			}
+
+			if (speedMbps >= 1000) {
+				return `${(
+					speedMbps / 1000
+				).toFixed(2)} Gbps`;
+			}
+
+			return `${speedMbps.toFixed(1)} Mbps`;
+		}
+
+
+		function formatLatency(
+			latency: number | null
+		) {
+			if (
+				latency === null ||
+				!Number.isFinite(latency)
+			) {
+				return '--';
+			}
+
+			return `${Math.round(latency)} ms`;
+		}
+
+
+		async function loadStatus() {
+			try {
+				const [
+					serversResponse,
+					servicesResponse
+				] = await Promise.all([
+					fetch('/api/servers'),
+					fetch('/api/services')
+				]);
+
+
+				if (
+					!serversResponse.ok ||
+					!servicesResponse.ok
+				) {
+					throw new Error(
+						'Failed to load status'
+					);
+				}
+
+
+				const servers =
+					await serversResponse.json() as Server[];
+
+				const services =
+					await servicesResponse.json() as Service[];
+
+
+				const statuses:
+					Array<'up' | 'down' | 'unknown'> = [];
+
+
+				// SERVERS
+
+				document
+					.querySelectorAll('.server-card')
+					.forEach((card) => {
+
+						const element =
+							card as HTMLElement;
+
+						const serverId =
+							Number(
+								element.dataset.serverId
+							);
+
+						const server =
+							servers.find(
+								(server) =>
+									server.id === serverId
+							);
+
+
+						const dot =
+							element.querySelector(
+								'.server-status-dot'
+							) as HTMLElement | null;
+
+						const statusText =
+							element.querySelector(
+								'.server-status-text'
+							) as HTMLElement | null;
+
+						const cpu =
+							element.querySelector(
+								'.server-cpu'
+							) as HTMLElement | null;
+
+						const memory =
+							element.querySelector(
+								'.server-memory'
+							) as HTMLElement | null;
+
+						const os =
+							element.querySelector(
+								'.server-os'
+							) as HTMLElement | null;
+
+						const ip =
+							element.querySelector(
+								'.server-ip'
+							) as HTMLElement | null;
+
+						const hostname =
+							element.querySelector(
+								'.server-hostname'
+							) as HTMLElement | null;
+
+
+						const status =
+							server?.status ?? 'unknown';
+
+
+						statuses.push(status);
+
+
+						if (dot) {
+							setDot(
+								dot,
+								status
+							);
+						}
+
+
+						if (statusText) {
+							statusText.textContent =
+								status === 'up'
+									? 'Online'
+									: status === 'down'
+										? 'Offline'
+										: 'Unknown';
+						}
+
+
+						if (cpu) {
+							cpu.textContent =
+								`CPU: ${
+									server
+										? `${Number(
+											server.cpu_usage
+										).toFixed(1)}%`
+										: '--'
+								}`;
+						}
+
+
+						if (memory) {
+							memory.textContent =
+								`Mem: ${
+									server
+										? `${Number(
+											server.memory_usage
+										).toFixed(1)}%`
+										: '--'
+								}`;
+						}
+
+
+						if (os) {
+							os.textContent =
+								parseOS(
+									server?.os ?? null
+								);
+						}
+
+
+						if (ip) {
+							ip.textContent =
+								server?.address ||
+								'Unknown';
+						}
+
+
+						if (hostname) {
+							hostname.textContent =
+								server?.hostname ||
+								'Unknown';
+						}
+
+					});
+
+
+				// NETWORK
+
+				const activeServer =
+					servers.find(
+						(server) =>
+							server.status === 'up'
+					);
+
+
+				const download =
+					document.querySelector(
+						'#network-download'
+					) as HTMLElement | null;
+
+				const upload =
+					document.querySelector(
+						'#network-upload'
+					) as HTMLElement | null;
+
+				const latency =
+					document.querySelector(
+						'#network-latency'
+					) as HTMLElement | null;
+
+
+				if (activeServer) {
+
+					if (download) {
+						download.textContent =
+							formatSpeed(
+								activeServer.network_download
+							);
+					}
+
+
+					if (upload) {
+						upload.textContent =
+							formatSpeed(
+								activeServer.network_upload
+							);
+					}
+
+
+					if (latency) {
+						latency.textContent =
+							formatLatency(
+								activeServer.network_latency
+							);
+					}
+
+				} else {
+
+					if (download) {
+						download.textContent =
+							'--';
+					}
+
+					if (upload) {
+						upload.textContent =
+							'--';
+					}
+
+					if (latency) {
+						latency.textContent =
+							'--';
+					}
+
+				}
+
+
+				// SERVICES
+
+				document
+					.querySelectorAll('.service-item')
+					.forEach((element) => {
+
+						const item =
+							element as HTMLElement;
+
+						const name =
+							item.dataset.serviceName;
+
+						const service =
+							services.find(
+								(service) =>
+									service.name === name
+							);
+
+						const status =
+							service?.status ??
+							'unknown';
+
+
+						statuses.push(status);
+
+
+						const dot =
+							item.querySelector(
+								'.service-status-dot'
+							) as HTMLElement | null;
+
+
+						if (dot) {
+							setDot(
+								dot,
+								status
+							);
+						}
+
+					});
+
+
+				updateOverallStatus(
+					statuses
+				);
+
+			} catch (error) {
+
+				console.error(
+					'Failed to load Homesrvr status:',
+					error
+				);
+
+			}
+		}
+
+
+		loadStatus();
+
+		setInterval(
+			loadStatus,
+			30_000
+		);
+	</script>
+
+</body>
+```
+
+</html>
