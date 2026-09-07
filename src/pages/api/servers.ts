@@ -1,61 +1,22 @@
-import type { APIRoute } from 'astro';
-import db from '../../lib/db';
-
-const OFFLINE_AFTER = 90;
-
-function getStatus(lastSeen: number | null) {
-    if (!lastSeen) {
-        return 'unknown';
-    }
-
-    const age =
-        Math.floor(Date.now() / 1000) - lastSeen;
-
-    if (age > OFFLINE_AFTER) {
-        return 'down';
-    }
-
-    return 'up';
-}
-
-export const GET: APIRoute = () => {
-    const servers = db.prepare(`
-        SELECT
-            id,
-            name,
-            address,
-            hostname,
-            os,
-            online,
-            cpu_usage,
-            memory_usage,
-            network_download,
-            network_upload,
-            network_latency,
-            last_seen
-        FROM servers
-        ORDER BY id ASC
-    `).all() as any[];
-
-    const result = servers.map((server) => ({
-        ...server,
-        status: getStatus(server.last_seen)
-    }));
-
-    return new Response(
-        JSON.stringify(result),
-        {
-            status: 200,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-    );
-};
-
 export const POST: APIRoute = async ({ request }) => {
     try {
         const body = await request.json();
+
+        const id = Number(body.id);
+
+        if (!Number.isInteger(id) || id <= 0) {
+            return new Response(
+                JSON.stringify({
+                    error: 'id is required and must be a positive number'
+                }),
+                {
+                    status: 400,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+        }
 
         if (
             typeof body.name !== 'string' ||
@@ -74,19 +35,39 @@ export const POST: APIRoute = async ({ request }) => {
             );
         }
 
-        const result = db.prepare(`
+        const existing = db.prepare(`
+            SELECT id FROM servers WHERE id = ?
+        `).get(id);
+
+        if (existing) {
+            return new Response(
+                JSON.stringify({
+                    error: 'Server ID already exists'
+                }),
+                {
+                    status: 409,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+        }
+
+        db.prepare(`
             INSERT INTO servers (
+                id,
                 name,
                 address
             )
-            VALUES (?, '')
+            VALUES (?, ?, '')
         `).run(
+            id,
             body.name.trim()
         );
 
         return new Response(
             JSON.stringify({
-                id: result.lastInsertRowid,
+                id,
                 name: body.name.trim(),
                 address: '',
                 hostname: null,
@@ -109,10 +90,7 @@ export const POST: APIRoute = async ({ request }) => {
         );
 
     } catch (error) {
-        console.error(
-            'Server creation error:',
-            error
-        );
+        console.error('Server creation error:', error);
 
         return new Response(
             JSON.stringify({
